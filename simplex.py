@@ -43,10 +43,19 @@ class Tableau():
     """ Structure which represents a tableau """
     
     def __init__(self, lp):
-        """ Convert a linear programm to a tableau and add slack variables """
+        """ Convert a linear programm to a tableau and add slack variables and variables for phase 1 """
         
         self.n = lp.m + 1
         self.m = lp.n + lp.m + 1
+        self.basis = []
+        self.phase_one = True
+        self.vars_added = 0
+
+        for i in range(0, lp.m):
+            if lp.b[i] < 0:
+                self.vars_added = self.vars_added + 1
+
+        self.m = self.m + self.vars_added
         
         self.tab = np.empty((self.n, self.m), dtype=Fraction)
 
@@ -67,9 +76,24 @@ class Tableau():
         for k in range(0, lp.m):
             self.tab[k+1, lp.n + k] = 1
 
+        temp = 0
+        for i in range(0, lp.m):
+            if lp.b[i] < 0:
+                self.tab[i+1] = -self.tab[i+1]
+                self.tab[i+1, self.m - 1 - self.vars_added + temp] = 1
+                self.basis.append(self.m - self.vars_added + temp)
+                temp = temp+1
+                
+            else:
+                self.basis.append(lp.n + i + 1)
+
+
     def print_tab(self):
         print("CURRENT TABLEAU")
         print(tabulate(self.tab))
+
+        print("BASIS")
+        print(self.basis)        
 
 
 def parse_e(e):
@@ -80,6 +104,8 @@ def parse_e(e):
         return Fraction(int(e[0]), int(e[1]))
 
 def parse_lp(filename):
+    """ Create a Lp() object from a lp given in filename """
+
     print("PARSING...")
     with open(filename, "r") as f:
         n = int(f.readline()[0])
@@ -107,7 +133,7 @@ def parse_lp(filename):
         return Lp(n, m, np.array(a), np.array(b), np.array(c))
     
 
-lin = parse_lp("linear_problem.in")
+lin = parse_lp("linear_problem1.in")
 lin.print_lp()
 t = Tableau(lin)
 t.print_tab()
