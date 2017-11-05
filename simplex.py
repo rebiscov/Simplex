@@ -37,8 +37,47 @@ class Lp:
         for i in range(1, self.n+1):
             lp[i][-1] = "<= " + str(self.b[i-1])
                 
-        print(tabulate(lp)) 
+        print(tabulate(lp))
 
-lin = Lp(2, 2, np.array([Fraction(1,2),2,3,4]).reshape(2,2), np.array([2,6]), np.array([4,9]))
 
+        
+
+
+def parse_e(e):
+    e = e.split("/")
+    if len(e) == 1:
+        return Fraction(int(e[0]), 1)
+    else:
+        return Fraction(int(e[0]), int(e[1]))
+
+def parse_lp(filename):
+    print("PARSING...")
+    with open(filename, "r") as f:
+        n = int(f.readline()[0])
+        m = int(f.readline()[0])
+
+        temp = f.readline().split()
+        c = []
+        for e in temp:
+            c.append(parse_e(e))
+
+        temp = f.readline().split()
+        b = []
+        for e in temp:
+            b.append(parse_e(e))
+
+        a = []
+        for temp in f:
+            temp = temp.split()
+            a.append([])
+            for e in temp:
+                a[-1].append(parse_e(e))
+
+        print("PARSING FINISHED.")
+
+        return Lp(m, n, np.array(a), np.array(b), np.array(c))
+    
+
+lin = parse_lp("linear_problem.in")
 lin.print_lp()
+
