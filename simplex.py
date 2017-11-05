@@ -39,6 +39,44 @@ class Lp:
                 
         print(tabulate(lp))
 
+
+
+def parse_e(e):
+    e = e.split("/")
+    if len(e) == 1:
+        return Fraction(int(e[0]), 1)
+    else:
+        return Fraction(int(e[0]), int(e[1]))
+
+def parse_lp(filename):
+    """ Create a Lp() object from a lp given in filename """
+
+    print("PARSING...")
+    with open(filename, "r") as f:
+        n = int(f.readline()[0])
+        m = int(f.readline()[0])
+
+        temp = f.readline().split()
+        c = []
+        for e in temp:
+            c.append(parse_e(e))
+
+        temp = f.readline().split()
+        b = []
+        for e in temp:
+            b.append(parse_e(e))
+
+        a = []
+        for temp in f:
+            temp = temp.split()
+            a.append([])
+            for e in temp:
+                a[-1].append(parse_e(e))
+
+        print("PARSING FINISHED.")
+
+        return Lp(n, m, np.array(a), np.array(b), np.array(c))        
+
 class Tableau():
     """ Structure which represents a tableau """
     
@@ -91,49 +129,12 @@ class Tableau():
     def print_tab(self):
         print("CURRENT TABLEAU")
         print(tabulate(self.tab))
-
         print("BASIS")
         print(self.basis)        
 
-
-def parse_e(e):
-    e = e.split("/")
-    if len(e) == 1:
-        return Fraction(int(e[0]), 1)
-    else:
-        return Fraction(int(e[0]), int(e[1]))
-
-def parse_lp(filename):
-    """ Create a Lp() object from a lp given in filename """
-
-    print("PARSING...")
-    with open(filename, "r") as f:
-        n = int(f.readline()[0])
-        m = int(f.readline()[0])
-
-        temp = f.readline().split()
-        c = []
-        for e in temp:
-            c.append(parse_e(e))
-
-        temp = f.readline().split()
-        b = []
-        for e in temp:
-            b.append(parse_e(e))
-
-        a = []
-        for temp in f:
-            temp = temp.split()
-            a.append([])
-            for e in temp:
-                a[-1].append(parse_e(e))
-
-        print("PARSING FINISHED.")
-
-        return Lp(n, m, np.array(a), np.array(b), np.array(c))
     
 
-lin = parse_lp("linear_problem1.in")
+lin = parse_lp("linear_problem.in")
 lin.print_lp()
 t = Tableau(lin)
 t.print_tab()
