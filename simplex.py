@@ -50,17 +50,26 @@ class Tableau():
         
         self.tab = np.empty((self.n, self.m), dtype=Fraction)
 
-        print(lp.a)
-        print(lp.n, lp.m)
-
         for i in range(0, self.n):
             for j in range(0, self.m):
                 self.tab[i, j] = Fraction(0,1)
 
         for i in range(1, lp.m+1):
             for j in range(0, lp.n):
-                print((i, j))
                 self.tab[i,j] = lp.a[i-1, j]
+
+        for i in range(1, lp.m+1):
+            self.tab[i, self.m-1] = lp.b[i-1]
+
+        for j in range(0, lp.n):
+            self.tab[0, j] = lp.c[j]
+
+        for k in range(0, lp.m):
+            self.tab[k+1, lp.n + k] = 1
+
+    def print_tab(self):
+        print("CURRENT TABLEAU")
+        print(tabulate(self.tab))
 
 
 def parse_e(e):
@@ -101,4 +110,4 @@ def parse_lp(filename):
 lin = parse_lp("linear_problem.in")
 lin.print_lp()
 t = Tableau(lin)
-print(tabulate(t.tab))
+t.print_tab()
