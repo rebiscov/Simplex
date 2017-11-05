@@ -119,18 +119,35 @@ class Tableau():
             if lp.b[i] < 0:
                 self.tab[i+1] = -self.tab[i+1]
                 self.tab[i+1, self.m - 1 - self.vars_added + temp] = 1
-                self.basis.append(self.m - self.vars_added + temp)
+                self.basis.append(self.m - 1 - self.vars_added + temp)
                 temp = temp+1
                 
             else:
-                self.basis.append(lp.n + i + 1)
+                self.basis.append(lp.n + i)
 
+    def do_pivot(entering_var, leaving_var):
+        self.basis.remove(leaving_var)
+        self.basis.append(entering_var)
+
+        line = 0
+        for i in range(1, self.m):
+            if self.tab[i, leaving_var] == 1:
+                line = i
+                break;
+
+        self.tab[i] = self.tab[i]/self.tab[i, entering_var]
+
+        for i in range(0, self.m):
+            if i == line:
+                continue
+            self.tab[i] = self.tab[i] - self.tab[i, entering_var] * self.tab[line]
+                
 
     def print_tab(self):
         print("CURRENT TABLEAU")
         print(tabulate(self.tab))
         print("BASIS")
-        print(self.basis)        
+        print(self.basis)
 
     
 
