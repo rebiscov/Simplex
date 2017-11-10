@@ -125,7 +125,7 @@ class Tableau():
             else:
                 self.basis.append(lp.n + i)
 
-    def do_pivot(entering_var, leaving_var):
+    def do_pivot(self, entering_var, leaving_var):
         self.basis.remove(leaving_var)
         self.basis.append(entering_var)
 
@@ -135,13 +135,13 @@ class Tableau():
                 line = i
                 break;
 
-        self.tab[i] = self.tab[i]/self.tab[i, entering_var]
-
-        for i in range(0, self.m):
+        self.tab[line] = self.tab[line]/self.tab[line, entering_var]
+        
+        for i in range(0, self.n):
             if i == line:
                 continue
             self.tab[i] = self.tab[i] - self.tab[i, entering_var] * self.tab[line]
-                
+            
 
     def print_tab(self):
         print("CURRENT TABLEAU")
@@ -154,4 +154,6 @@ class Tableau():
 lin = parse_lp("linear_problem.in")
 lin.print_lp()
 t = Tableau(lin)
+t.print_tab()
+t.do_pivot(0,2)
 t.print_tab()
