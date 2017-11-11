@@ -150,12 +150,22 @@ class Tableau():
     def get_nonbasic(self):
         return [x for x in range(self.m - 1) if x not in self.basis]
 
+    def choose_entering_naive(self):
+        var = None
+        for j in range(0, self.m - 1):
+            if self.tab[0, j] > 0:
+                var = j
+                break
+            
+        return var
     
 
 lin = parse_lp("linear_problem.in")
 lin.print_lp()
 t = Tableau(lin)
 t.print_tab()
+print("ENTERING VAR {}".format(t.choose_entering_naive()))
+"""
 print(" ----------------------------------")
 lin = parse_lp("linear_problem2.in")
 lin.print_lp()
@@ -166,3 +176,4 @@ lin = parse_lp("linear_problem3.in")
 lin.print_lp()
 t = Tableau(lin)
 t.print_tab()
+"""
