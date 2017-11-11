@@ -151,6 +151,9 @@ class Tableau():
         print("\n\n", end="")
 
     def write_obj_vector(self): # once phase1 is completed, preparing for phase2
+        self.tab = np.delete(self.tab, np.s_[self.m -1 - self.vars_added:-1], 1)
+        self.m = self.m - self.vars_added        
+        
         for j in range(len(self.c)):
             self.tab[0, j] = self.c[j]
 
@@ -199,7 +202,7 @@ class Tableau():
         return leaving_var
     
 
-lin = parse_lp("phase1.in")
+lin = parse_lp("example1.in")
 lin.print_lp()
 t = Tableau(lin)
 t.print_tab()
