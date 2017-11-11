@@ -125,9 +125,6 @@ class Tableau():
                     self.tab[0] = self.tab[0] + self.tab[i]
                     break
 
-        if self.vars_added == 0:
-            self.phase_one = False
-
     def do_pivot(self, entering_var, leaving_var):
         self.basis.remove(leaving_var)
         self.basis.append(entering_var)
