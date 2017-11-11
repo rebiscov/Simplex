@@ -41,7 +41,7 @@ class Lp:
 
 
 
-def parse_e(e):
+def parse_e(e): # function which takes a string of a fraction and returns a Fraction
     e = e.split("/")
     if len(e) == 1:
         return Fraction(int(e[0]), 1)
@@ -53,8 +53,8 @@ def parse_lp(filename):
 
     print("PARSING...")
     with open(filename, "r") as f:
-        n = int(f.readline()[0])
-        m = int(f.readline()[0])
+        n = int(f.readline()[:-1])
+        m = int(f.readline()[:-1])
 
         temp = f.readline().split()
         c = []
@@ -83,47 +83,42 @@ class Tableau():
     def __init__(self, lp):
         """ Convert a linear programm to a tableau and add slack variables and variables for phase 1 """
         
-        self.n = lp.m + 1
-        self.m = lp.n + lp.m + 1
+        self.n = lp.m + 1 # n is the number of lines in the tableau
+        self.m = lp.n + lp.m + 1 # m is the number of columns in the tableau
         self.basis = []
         self.phase_one = True
         self.vars_added = 0
+        self.c = lp.c # we save the objective function for phase 2
 
         for i in range(0, lp.m):
-            if lp.b[i] < 0:
+            if lp.b[i] < 0: 
+                self.basis.append(lp.n + lp.m + self.vars_added) # add variable for phase 1
                 self.vars_added = self.vars_added + 1
+            else:
+                self.basis.append(lp.n + i) # add variable slack variable to the basis for phase 1
 
         self.m = self.m + self.vars_added
+                
+        self.tab = np.zeros((self.n, self.m), dtype=Fraction) # Creating the tableau
         
-        self.tab = np.empty((self.n, self.m), dtype=Fraction)
-
-        for i in range(0, self.n):
-            for j in range(0, self.m):
-                self.tab[i, j] = Fraction(0,1)
-
-        for i in range(1, lp.m+1):
-            for j in range(0, lp.n):
-                self.tab[i,j] = lp.a[i-1, j]
-
-        for i in range(1, lp.m+1):
-            self.tab[i, self.m-1] = lp.b[i-1]
-
-        for j in range(0, lp.n):
-            self.tab[0, j] = lp.c[j]
-
-        for k in range(0, lp.m):
-            self.tab[k+1, lp.n + k] = 1
+        for j in range(len(self.basis)): # add the objective function for phase 1
+            self.tab[0, self.basis[j]] = -1
 
         temp = 0
-        for i in range(0, lp.m):
-            if lp.b[i] < 0:
-                self.tab[i+1] = -self.tab[i+1]
-                self.tab[i+1, self.m - 1 - self.vars_added + temp] = 1
-                self.basis.append(self.m - 1 - self.vars_added + temp)
-                temp = temp+1
-                
-            else:
-                self.basis.append(lp.n + i)
+        for i in range(1, self.n): # filling the tableau with each constraints
+            for j in range(0, lp.n):
+                self.tab[i, j] = lp.a[i-1, j]
+            self.tab[i, lp.n + i - 1] = 1
+            self.tab[i, -1] = lp.b[i-1]
+            
+            if lp.b[i-1] < 0: # taking the opposite line
+                self.tab[i] = -self.tab[i]
+                self.tab[i, lp.n + lp.m + temp] = 1 # add variable for phase 1
+                temp = temp + 1
+
+            self.tab[0] = self.tab[0] + self.tab[i]
+
+
 
     def do_pivot(self, entering_var, leaving_var):
         self.basis.remove(leaving_var)
@@ -155,5 +150,13 @@ lin = parse_lp("linear_problem.in")
 lin.print_lp()
 t = Tableau(lin)
 t.print_tab()
-t.do_pivot(0,2)
+print(" ----------------------------------")
+lin = parse_lp("linear_problem2.in")
+lin.print_lp()
+t = Tableau(lin)
+t.print_tab()
+print(" ----------------------------------")
+lin = parse_lp("linear_problem3.in")
+lin.print_lp()
+t = Tableau(lin)
 t.print_tab()
