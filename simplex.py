@@ -153,13 +153,13 @@ class Tableau():
     def write_obj_vector(self): # once phase1 is completed, preparing for phase2
         for j in range(len(self.c)):
             self.tab[0, j] = self.c[j]
+
         for j in range(len(self.c), self.m):
             self.tab[0, j] = 0
 
         for i in range(1, self.n):
             var_of_basis = self.basic_var_of_line(i)
-            self.tab[0] = self.tab[0] - self.tab[0, var_of_basis]*self.tab[i]
-                    
+            self.tab[0] = self.tab[0] - self.tab[0, var_of_basis] * self.tab[i]
             
 
     def get_basic(self):
@@ -214,7 +214,19 @@ while e_v != None:
     e_v = t.choose_entering_naive()
 
 t.write_obj_vector()
+print("WRITE OBJ VECTOR")
 t.print_tab()
+
+print("PHASE 2")
+
+e_v = t.choose_entering_naive()
+while e_v != None:
+    l_v = t.choose_leaving_var(e_v)
+    print("ENTERING VAR {}".format(e_v))
+    print("LEAVING VAR {}".format(l_v))    
+    t.do_pivot(e_v, l_v)
+    t.print_tab()
+    e_v = t.choose_entering_naive()
 """
 print(" ----------------------------------")
 lin = parse_lp("linear_problem2.in")
