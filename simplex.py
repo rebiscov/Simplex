@@ -88,7 +88,7 @@ class Tableau():
         self.basis = []
         self.phase_one = True
         self.vars_added = 0
-        self.c = lp.c # we save the objective function for phase 2
+        self.c = lp.c.copy() # we save the objective function for phase 2
 
         for i in range(0, lp.m):
             if lp.b[i] < 0: 
@@ -150,6 +150,18 @@ class Tableau():
         print(self.basis)
         print("\n\n", end="")
 
+    def write_obj_vector(self): # once phase1 is completed, preparing for phase2
+        for j in range(len(self.c)):
+            self.tab[0, j] = self.c[j]
+        for j in range(len(self.c), self.m):
+            self.tab[0, j] = 0
+
+        for i in range(1, self.n):
+            var_of_basis = self.basic_var_of_line(i)
+            self.tab[0] = self.tab[0] - self.tab[0, var_of_basis]*self.tab[i]
+                    
+            
+
     def get_basic(self):
         return self.basis
 
@@ -201,6 +213,8 @@ while e_v != None:
     t.print_tab()
     e_v = t.choose_entering_naive()
 
+t.write_obj_vector()
+t.print_tab()
 """
 print(" ----------------------------------")
 lin = parse_lp("linear_problem2.in")
