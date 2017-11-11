@@ -202,7 +202,7 @@ class Tableau():
         return leaving_var
     
 
-lin = parse_lp("example1.in")
+lin = parse_lp("tests/example1.in")
 lin.print_lp()
 t = Tableau(lin)
 t.print_tab()
