@@ -4,4 +4,4 @@ This is my repo for the [simplex algorithm](https://en.wikipedia.org/wiki/Simple
 
 ## Dependencies
 
-This program is coded in python3 and uses [numpy](http://www.numpy.org/) and [tabulate](https://pypi.python.org/pypi/tabulate)
+This program is written in python3 and uses [numpy](http://www.numpy.org/) and [tabulate](https://pypi.python.org/pypi/tabulate)
