@@ -150,7 +150,12 @@ class Tableau():
     def get_nonbasic(self):
         return [x for x in range(self.m - 1) if x not in self.basis]
 
-    def choose_entering_naive(self):
+    def basic_var_of_line(self, line): # returns the basic variable of the line
+        for var in self.basis:
+            if self.tab[line, var] == 1:
+                return var
+    
+    def choose_entering_naive(self): # choose the entering var in a naive way
         var = None
         for j in range(0, self.m - 1):
             if self.tab[0, j] > 0:
@@ -158,13 +163,32 @@ class Tableau():
                 break
             
         return var
+
+    def choose_leaving_var(self, entering_var): # choose what is the leaving variable
+        bound = None
+        leaving_var = None
+        for i in range(1, self.n):
+            if self.tab[i, entering_var] > 0:
+                if bound == None:
+                    bound = self.tab[i, -1]/self.tab[i, entering_var]
+                    leaving_var = self.basic_var_of_line(i)
+                else:
+                    temp = min(bound, self.tab[i, -1]/self.tab[i, entering_var])
+                    if temp != bound:
+                        leaving_var = self.basic_var_of_line(i)
+                        bound = temp
+
+        return leaving_var
     
 
 lin = parse_lp("linear_problem.in")
 lin.print_lp()
 t = Tableau(lin)
 t.print_tab()
-print("ENTERING VAR {}".format(t.choose_entering_naive()))
+e_v = t.choose_entering_naive()
+l_v = t.choose_leaving_var(e_v)
+print("ENTERING VAR {}".format(e_v))
+print("LEAVING VAR {}".format(l_v))
 """
 print(" ----------------------------------")
 lin = parse_lp("linear_problem2.in")
