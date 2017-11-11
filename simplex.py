@@ -100,9 +100,10 @@ class Tableau():
         self.m = self.m + self.vars_added
                 
         self.tab = np.zeros((self.n, self.m), dtype=Fraction) # Creating the tableau
-        
+
         for j in range(len(self.basis)): # add the objective function for phase 1
-            self.tab[0, self.basis[j]] = -1
+            if self.basis[j] >= lp.n + lp.m:
+                self.tab[0, self.basis[j]] = -1
 
         temp = 0
         for i in range(1, self.n): # filling the tableau with each constraints
@@ -116,9 +117,16 @@ class Tableau():
                 self.tab[i, lp.n + lp.m + temp] = 1 # add variable for phase 1
                 temp = temp + 1
 
-            self.tab[0] = self.tab[0] + self.tab[i]
+        for j in range(lp.n + lp.m, self.m - 1): # writing the obj vector in function of non basic vars
+            if self.tab[0, j] != -1:
+                continue
+            for i in range(1, self.n):
+                if self.tab[i, j] == 1:
+                    self.tab[0] = self.tab[0] + self.tab[i]
+                    break
 
-
+        if self.vars_added == 0:
+            self.phase_one = False
 
     def do_pivot(self, entering_var, leaving_var):
         self.basis.remove(leaving_var)
@@ -143,6 +151,7 @@ class Tableau():
         print(tabulate(self.tab))
         print("BASIS")
         print(self.basis)
+        print("\n\n", end="")
 
     def get_basic(self):
         return self.basis
@@ -173,22 +182,28 @@ class Tableau():
                     bound = self.tab[i, -1]/self.tab[i, entering_var]
                     leaving_var = self.basic_var_of_line(i)
                 else:
-                    temp = min(bound, self.tab[i, -1]/self.tab[i, entering_var])
-                    if temp != bound:
+                    temp = self.tab[i, -1]/self.tab[i, entering_var]
+                    if temp < bound:
                         leaving_var = self.basic_var_of_line(i)
                         bound = temp
 
         return leaving_var
     
 
-lin = parse_lp("linear_problem.in")
+lin = parse_lp("phase1.in")
 lin.print_lp()
 t = Tableau(lin)
 t.print_tab()
+
 e_v = t.choose_entering_naive()
-l_v = t.choose_leaving_var(e_v)
-print("ENTERING VAR {}".format(e_v))
-print("LEAVING VAR {}".format(l_v))
+while e_v != None:
+    l_v = t.choose_leaving_var(e_v)
+    print("ENTERING VAR {}".format(e_v))
+    print("LEAVING VAR {}".format(l_v))    
+    t.do_pivot(e_v, l_v)
+    t.print_tab()
+    e_v = t.choose_entering_naive()
+
 """
 print(" ----------------------------------")
 lin = parse_lp("linear_problem2.in")
