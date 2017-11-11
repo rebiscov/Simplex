@@ -144,6 +144,12 @@ class Tableau():
         print("BASIS")
         print(self.basis)
 
+    def get_basic(self):
+        return self.basis
+
+    def get_nonbasic(self):
+        return [x for x in range(self.m - 1) if x not in self.basis]
+
     
 
 lin = parse_lp("linear_problem.in")
