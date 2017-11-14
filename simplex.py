@@ -202,7 +202,7 @@ class Tableau():
         return leaving_var
 
     def phase(self):
-        e_v = self.choose_entering()        
+        e_v = self.choose_entering_naive()        
         while e_v != None:
             l_v = self.choose_leaving_var(e_v)
 
@@ -213,12 +213,13 @@ class Tableau():
             print("LEAVING VAR {}".format(l_v))    
             self.do_pivot(e_v, l_v)
             self.print_tab()
-            e_v = self.choose_entering()
+            e_v = self.choose_entering_naive()
             
         return self.tab[0, -1]
 
-    def solve_simplex(self, choose_entering = self.choose_entering_naive):
+    def solve_simplex(self):
         print("BEGINNING OF PHASE 1")
+        self.print_tab()
         
         self.phase()
 
@@ -238,45 +239,11 @@ class Tableau():
             print("END OF PHASE 2")
             print("Here is the final tableau")
             self.print_tab()
+            print("The optimal value is {}".format(-self.tab[0, -1]))
             
 
-lin = parse_lp("tests/example1.in")
+lin = parse_lp("tests/unbounded.in")
 lin.print_lp()
 t = Tableau(lin)
-t.print_tab()
+t.solve_simplex()
 
-e_v = t.choose_entering_naive()
-while e_v != None:
-    l_v = t.choose_leaving_var(e_v)
-    print("ENTERING VAR {}".format(e_v))
-    print("LEAVING VAR {}".format(l_v))    
-    t.do_pivot(e_v, l_v)
-    t.print_tab()
-    e_v = t.choose_entering_naive()
-
-t.write_obj_vector()
-print("WRITE OBJ VECTOR")
-t.print_tab()
-
-print("PHASE 2")
-
-e_v = t.choose_entering_naive()
-while e_v != None:
-    l_v = t.choose_leaving_var(e_v)
-    print("ENTERING VAR {}".format(e_v))
-    print("LEAVING VAR {}".format(l_v))    
-    t.do_pivot(e_v, l_v)
-    t.print_tab()
-    e_v = t.choose_entering_naive()
-"""
-print(" ----------------------------------")
-lin = parse_lp("linear_problem2.in")
-lin.print_lp()
-t = Tableau(lin)
-t.print_tab()
-print(" ----------------------------------")
-lin = parse_lp("linear_problem3.in")
-lin.print_lp()
-t = Tableau(lin)
-t.print_tab()
-"""
