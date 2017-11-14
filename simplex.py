@@ -201,8 +201,10 @@ class Tableau():
 
         return leaving_var
 
-    def phase(self):
-        e_v = self.choose_entering_naive()        
+    def phase(self, entering):
+        self.choose_entering = entering
+
+        e_v = self.choose_entering()
         while e_v != None:
             l_v = self.choose_leaving_var(e_v)
 
@@ -213,15 +215,18 @@ class Tableau():
             print("LEAVING VAR {}".format(l_v))    
             self.do_pivot(e_v, l_v)
             self.print_tab()
-            e_v = self.choose_entering_naive()
+            e_v = self.choose_entering()
             
         return self.tab[0, -1]
 
-    def solve_simplex(self):
+    def solve_simplex(self, choose_entering = None):
+        if choose_entering == None:
+            choose_entering = self.choose_entering_naive
+
         print("BEGINNING OF PHASE 1")
         self.print_tab()
         
-        self.phase()
+        self.phase(choose_entering)
 
         if self.tab[0, -1] != 0:
             print("The linear problem is unfeasible")
@@ -233,7 +238,7 @@ class Tableau():
         t.write_obj_vector()
         self.print_tab()
 
-        if self.phase() == None:
+        if self.phase(choose_entering) == None:
             print("The linear problem is unbounded")
         else:
             print("END OF PHASE 2")
@@ -245,5 +250,6 @@ class Tableau():
 lin = parse_lp("tests/unbounded.in")
 lin.print_lp()
 t = Tableau(lin)
-t.solve_simplex()
+t.solve_simplex(Tableau.choose_entering_naive(t))
+
 
