@@ -185,7 +185,7 @@ class Tableau():
             
         return var
 
-    def choose_leaving_var(self, entering_var): # choose what is the leaving variable
+    def choose_leaving_var(self, entering_var): # choose what is the leaving variable, returns None if it is unbounded
         bound = None
         leaving_var = None
         for i in range(1, self.n):
