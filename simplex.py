@@ -200,7 +200,45 @@ class Tableau():
                         bound = temp
 
         return leaving_var
-    
+
+    def phase(self):
+        e_v = self.choose_entering()        
+        while e_v != None:
+            l_v = self.choose_leaving_var(e_v)
+
+            if l_v == None: # meaning the linear problem is unbounded
+                return None
+            
+            print("ENTERING VAR {}".format(e_v))
+            print("LEAVING VAR {}".format(l_v))    
+            self.do_pivot(e_v, l_v)
+            self.print_tab()
+            e_v = self.choose_entering()
+            
+        return self.tab[0, -1]
+
+    def solve_simplex(self, choose_entering = self.choose_entering_naive):
+        print("BEGINNING OF PHASE 1")
+        
+        self.phase()
+
+        if self.tab[0, -1] != 0:
+            print("The linear problem is unfeasible")
+            return
+        
+        print("END OF PHASE 1\n")
+        
+        print("BEGINNING OF PHASE 2")
+        t.write_obj_vector()
+        self.print_tab()
+
+        if self.phase() == None:
+            print("The linear problem is unbounded")
+        else:
+            print("END OF PHASE 2")
+            print("Here is the final tableau")
+            self.print_tab()
+            
 
 lin = parse_lp("tests/example1.in")
 lin.print_lp()
