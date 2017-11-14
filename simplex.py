@@ -89,6 +89,7 @@ class Tableau():
         self.phase_one = True
         self.vars_added = 0
         self.c = lp.c.copy() # we save the objective function for phase 2
+        self.basic_var_line = []
 
         for i in range(0, lp.m):
             if lp.b[i] < 0: 
@@ -125,6 +126,13 @@ class Tableau():
                     self.tab[0] = self.tab[0] + self.tab[i]
                     break
 
+        self.basic_of_line = self.m * [-1]
+        for var in self.basis:
+            for i in range(1, self.m):
+                if self.tab[i, var] == 1:
+                    self.basic_of_line[i] = var
+                    break
+
     def do_pivot(self, entering_var, leaving_var):
         self.basis.remove(leaving_var)
         self.basis.append(entering_var)
@@ -134,6 +142,8 @@ class Tableau():
             if self.tab[i, leaving_var] == 1:
                 line = i
                 break;
+
+        self.basic_of_line[line] = entering_var
 
         self.tab[line] = self.tab[line]/self.tab[line, entering_var]
         
@@ -163,6 +173,8 @@ class Tableau():
         for i in range(1, self.n):
             var_of_basis = self.basic_var_of_line(i)
             self.tab[0] = self.tab[0] - self.tab[0, var_of_basis] * self.tab[i]
+
+        self.basic_of_line = self.basic_of_line[:self.m]
             
 
     def get_basic(self):
@@ -172,9 +184,12 @@ class Tableau():
         return [x for x in range(self.m - 1) if x not in self.basis]
 
     def basic_var_of_line(self, line): # returns the basic variable of the line
+        """
         for var in self.basis:
             if self.tab[line, var] == 1:
                 return var
+        """
+        return self.basic_of_line[line]
     
     def choose_entering_naive(self): # choose the entering var in a naive way
         var = None
@@ -247,7 +262,7 @@ class Tableau():
             print("The optimal value is {}".format(-self.tab[0, -1]))
             
 
-lin = parse_lp("tests/unbounded.in")
+lin = parse_lp("tests/example1.in")
 lin.print_lp()
 t = Tableau(lin)
 t.solve_simplex(Tableau.choose_entering_naive(t))
