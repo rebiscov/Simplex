@@ -295,10 +295,9 @@ class Tableau():
 
 if len(sys.argv) > 1:
     lin = parse_lp(sys.argv[1])
+    lin.print_lp()
+    t = Tableau(lin)
+    t.solve_simplex("r")
 else:
-    lin = parse_lp("tests/example1.in")
-lin.print_lp()
-t = Tableau(lin)
-t.solve_simplex("r")
-
+    print("No file has been given.")
 
