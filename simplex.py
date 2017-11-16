@@ -239,8 +239,8 @@ class Tableau():
             
         return self.tab[0, -1]
 
-    def solve_simplex(self, choose_entering = None):
-        if choose_entering == None:
+    def solve_simplex(self, pivot_rule = None):
+        if pivot_rule == None:
             choose_entering = self.choose_entering_naive
 
         print("BEGINNING OF PHASE 1")
