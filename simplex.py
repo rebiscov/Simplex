@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 from tabulate import *
 from fractions import Fraction
 
@@ -262,7 +263,10 @@ class Tableau():
             print("The optimal value is {}".format(-self.tab[0, -1]))
             
 
-lin = parse_lp("tests/example1.in")
+if len(sys.argv) > 1:
+    lin = parse_lp(sys.argv[1])
+else:
+    lin = parse_lp("tests/example1.in")
 lin.print_lp()
 t = Tableau(lin)
 t.solve_simplex(Tableau.choose_entering_naive(t))
