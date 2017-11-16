@@ -192,7 +192,7 @@ class Tableau():
         """
         return self.basic_of_line[line]
     
-    def choose_entering_naive(self): # choose the entering var in a naive way
+    def choose_entering_naive(self): # choose the entering var in a naive way, it naturally follows Bland's rules
         var = None
         for j in range(0, self.m - 1):
             if self.tab[0, j] > 0:
@@ -201,7 +201,7 @@ class Tableau():
             
         return var
 
-    def choose_leaving_var(self, entering_var): # choose what is the leaving variable, returns None if it is unbounded
+    def choose_leaving_var(self, entering_var): # choose what is the leaving variable, returns None if it is unbounded, applies Bland's rules
         bound = None
         leaving_var = None
         for i in range(1, self.n):
@@ -214,6 +214,10 @@ class Tableau():
                     if temp < bound:
                         leaving_var = self.basic_var_of_line(i)
                         bound = temp
+                    elif temp == bound: # if there is a tie, applies Bland's rules
+                        if leaving_var < self.basic_var_of_line(i):
+                            leaving_var = self.basic_var_of_line(i)
+                            bound = temp
 
         return leaving_var
 
