@@ -249,7 +249,7 @@ class Tableau():
         self.phase(choose_entering)
 
         if self.tab[0, -1] != 0:
-            print("The linear problem is unfeasible")
+            print("The linear problem is INFEASIBLE")
             return
         
         print("END OF PHASE 1\n")
@@ -273,6 +273,6 @@ else:
     lin = parse_lp("tests/example1.in")
 lin.print_lp()
 t = Tableau(lin)
-t.solve_simplex(Tableau.choose_entering_naive(t))
+t.solve_simplex()
 
 
