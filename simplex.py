@@ -2,6 +2,7 @@ import numpy as np
 import sys
 from tabulate import *
 from fractions import Fraction
+from random import randint
 
 class Lp:
     """ class that will store the linear problem """
@@ -201,6 +202,27 @@ class Tableau():
             
         return var
 
+    def choose_entering_max_coeff(self): # choose the to add in the basis the variable with the biggest coefficient in the objective vector
+        var = None
+        for j in range(0, self.m - 1):
+            if self.tab[0, j] > 0 and var == None:
+                var = j
+            elif var != None and self.tab[0, var] < self.tab[0, j]:
+                var = j
+
+        return var
+
+    def choose_entering_random(self):
+        L = []
+        for j in range(0, self.m - 1):
+            if self.tab[0, j] > 0:
+                L.append(j)
+
+        if L == []:
+            return None
+        else:
+            return L[randint(0, len(L) - 1)]
+
     def choose_leaving_var(self, entering_var): # choose what is the leaving variable, returns None if it is unbounded, applies Bland's rules
         bound = None
         leaving_var = None
@@ -242,6 +264,10 @@ class Tableau():
     def solve_simplex(self, pivot_rule = None):
         if pivot_rule == None:
             choose_entering = self.choose_entering_naive
+        elif pivot_rule == "m":
+            choose_entering = self.choose_entering_max_coeff
+        elif pivot_rule == "r":
+            choose_entering = self.choose_entering_random
 
         print("BEGINNING OF PHASE 1")
         self.print_tab()
@@ -273,6 +299,6 @@ else:
     lin = parse_lp("tests/example1.in")
 lin.print_lp()
 t = Tableau(lin)
-t.solve_simplex()
+t.solve_simplex("r")
 
 
