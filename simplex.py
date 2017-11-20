@@ -139,6 +139,11 @@ class Tableau():
         self.basis.remove(leaving_var)
         self.basis.append(entering_var)
 
+        try: # self.pivot may not be defined
+            self.nb_pivot = self.nb_pivot + 1
+        except:
+            pass
+
         line = 0
         for i in range(1, self.m):
             if self.tab[i, leaving_var] == 1:
@@ -269,6 +274,8 @@ class Tableau():
         elif pivot_rule == "r":
             choose_entering = self.choose_entering_random
 
+        self.nb_pivot = 0
+
         print("BEGINNING OF PHASE 1")
         self.print_tab()
         
@@ -291,6 +298,10 @@ class Tableau():
             print("Here is the final tableau")
             self.print_tab()
             print("The optimal value is {}".format(-self.tab[0, -1]))
+            try:
+                print("{} pivots were performed".format(self.nb_pivot))
+            except:
+                pass
             
 
 if len(sys.argv) > 1:
