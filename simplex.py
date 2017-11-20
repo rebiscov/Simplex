@@ -4,6 +4,21 @@ from tabulate import *
 from fractions import Fraction
 from random import randint
 
+def argparse():
+    debug = False
+    pivot_rule = None
+    lin = ""
+    for k in sys.argv[1:]:
+        if k == "-r":
+            pivot_rule = "r"
+        elif k == "-m":
+            pivot_rule = "m"
+        elif k == "-v":
+            debug = True
+        else:
+            lin = k
+    return (debug, pivot_rule, lin)
+
 class Lp:
     """ class that will store the linear problem """
     def __init__(self, n, m, constraints_matrix, constraints_vector, objective_vector):
@@ -92,6 +107,8 @@ class Tableau():
         self.vars_added = 0
         self.c = lp.c.copy() # we save the objective function for phase 2
         self.basic_var_line = []
+        self.debug = False
+        self.pivot_rule_name = "Naive"
 
         for i in range(0, lp.m):
             if lp.b[i] < 0: 
@@ -257,58 +274,75 @@ class Tableau():
 
             if l_v == None: # meaning the linear problem is unbounded
                 return None
-            
-            print("ENTERING VAR {}".format(e_v))
-            print("LEAVING VAR {}".format(l_v))    
+
             self.do_pivot(e_v, l_v)
-            self.print_tab()
+            
+            if self.debug:
+                print("ENTERING VAR {}".format(e_v))
+                print("LEAVING VAR {}".format(l_v))    
+                self.print_tab()
+
             e_v = self.choose_entering()
             
         return self.tab[0, -1]
 
-    def solve_simplex(self, pivot_rule = None):
+    def solve_simplex(self, pivot_rule = None, debug=False):
         if pivot_rule == None:
             choose_entering = self.choose_entering_naive
+            self.pivot_rule_name = "Naive"
         elif pivot_rule == "m":
             choose_entering = self.choose_entering_max_coeff
+            self.pivot_rule_name = "Max coefficient"            
         elif pivot_rule == "r":
             choose_entering = self.choose_entering_random
+            self.pivot_rule_name = "Random"            
 
         self.nb_pivot = 0
+        self.debug = debug
 
-        print("BEGINNING OF PHASE 1")
-        self.print_tab()
+        if self.debug:
+            print("BEGINNING OF PHASE 1")            
+            self.print_tab()
         
         self.phase(choose_entering)
 
         if self.tab[0, -1] != 0:
             print("The linear problem is INFEASIBLE")
             return
-        
-        print("END OF PHASE 1\n")
-        
-        print("BEGINNING OF PHASE 2")
+
+        if self.debug:
+            print("END OF PHASE 1\n")
+            print("BEGINNING OF PHASE 2")
+            
         t.write_obj_vector()
-        self.print_tab()
+        
+        if self.debug:
+            self.print_tab()
 
         if self.phase(choose_entering) == None:
             print("The linear problem is unbounded")
         else:
-            print("END OF PHASE 2")
-            print("Here is the final tableau")
-            self.print_tab()
-            print("The optimal value is {}".format(-self.tab[0, -1]))
-            try:
-                print("{} pivots were performed".format(self.nb_pivot))
-            except:
-                pass
+            if self.debug:
+                print("END OF PHASE 2")                
+                print("Here is the final tableau")
+                self.print_tab()
+            print("\nThe optimal value is {}".format(-self.tab[0, -1]))
+            if self.debug:
+                print("The pivot rule used is {}".format(self.pivot_rule_name))
+                try:
+                    print("{} pivots were performed".format(self.nb_pivot))
+                except:
+                    pass
             
 
 if len(sys.argv) > 1:
-    lin = parse_lp(sys.argv[1])
-    lin.print_lp()
+    debug = False
+    pivot_rule = None
+    debug, pivot, filename = argparse()
+    lin = parse_lp(filename)
+    lin.print_lp()    
     t = Tableau(lin)
-    t.solve_simplex("r")
+    t.solve_simplex(pivot, debug)
 else:
     print("No file has been given.")
 
