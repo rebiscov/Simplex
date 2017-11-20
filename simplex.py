@@ -4,7 +4,7 @@ from tabulate import *
 from fractions import Fraction
 from random import randint
 
-def argparse():
+def argparse():  # function to get the arguments passed by the user
     debug = False
     pivot_rule = None
     lin = ""
@@ -339,6 +339,10 @@ if len(sys.argv) > 1:
     debug = False
     pivot_rule = None
     debug, pivot, filename = argparse()
+    if filename == "":
+        print("No file has been given.")
+        exit(1)
+        
     lin = parse_lp(filename)
     lin.print_lp()    
     t = Tableau(lin)
